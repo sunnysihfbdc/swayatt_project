@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: swayatt-logo-app-service
+  namespace: swayatt
+spec:
+  type: NodePort          # expose on nodes so ALB can forward
+  selector:
+    app: swayatt-logo-app
+  ports:
+    - port: 80
+      targetPort: 3000    # container port
+      nodePort: 30080     # port on the EC2 nodes
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swayatt-logo-app
+  namespace: swayatt
+  labels:
+    app: swayatt-logo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swayatt-logo-app
+  template:
+    metadata:
+      labels:
+        app: swayatt-logo-app
+    spec:
+      containers:
+        - name: swayatt-logo-app
+          image: 805595753393.dkr.ecr.eu-central-1.amazonaws.com/swayatt-ecr-repo:latest
+          imagePullPolicy: Always
